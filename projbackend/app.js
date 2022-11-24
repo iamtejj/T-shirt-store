@@ -8,6 +8,7 @@ const cors = require('cors');
 //my routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const categoryRoutes = require('./routes/category');
 //connect to DB
 mongoose.connect(process.env.DATABASE, {useNewUrlParser: true, useUnifiedTopology: true,useCreateIndex:true})
 .then(()=>{
@@ -22,7 +23,8 @@ app.use(cors());
 //MY Routes
 app.use('/api',authRoutes);
 app.use('/api',userRoutes);
-app.use('/',userRoutes);
+app.use('/api',categoryRoutes);
+
 
 //Port
 const port = process.env.PORT || 300;
