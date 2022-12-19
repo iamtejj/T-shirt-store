@@ -2,6 +2,7 @@ const Product = require('../models/product');
 const formidable = require('formidable');
 const _ = require('lodash');
 const fs = require('fs');
+const { sortBy } = require('lodash');
 
 exports.getProductById = (req,res,next,id) => {
     Product.findById(id).exec((err,product) => {
@@ -107,7 +108,7 @@ exports.updateProduct = (req,res) =>{
             });
         }
 
-        // update the product
+        // updation the product (code)
 
         let product = req.product;
         product = _.extend(product,fields);
@@ -134,4 +135,53 @@ exports.updateProduct = (req,res) =>{
 
         })
     });
+}
+
+exports.getAllProducts = (req,res) =>{
+    let limit = req.query.limit ? parseInt(req.query.limit) : 8;
+    let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
+    Product.find()
+    .select('-photo')
+    .populate('category')
+    .limit(limit)
+    .sort([[sortBy,"asc"]])
+    .exec((err,products) =>{
+        if(err){
+            return res.json(400).json({
+                error:"No Product Found"
+            });
+        }
+        res.json(products)
+    })
+}
+
+exports.updateStock = (req,res,next) =>{
+    let myoperation = req.body.order.products.map((prod)=>{
+        return {
+            updateOne: {
+              filter: { _id: prod._id },
+              update: {$inc:{stock:-prod.count,sold:+prod.count} }
+            }
+          }
+    });
+    Product.bulkWrite(myoperation,{},(err,products)=>{
+        if(err){
+            return res.status(400).json({
+                error:"Bulk operation Failed"
+            })
+        }
+        next();
+    })
+
+}
+
+exports.getAllUniqueCategories = ( req , res ) =>{
+    Product.distinct('category',{},(error,category)=>{
+        if(err){
+            return res.status(400).json({
+                error:"no category found"
+            })
+        }
+        return res.json(category)
+    })
 }
