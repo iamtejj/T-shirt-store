@@ -7,13 +7,13 @@ var ExpressJwt = require('express-jwt');
 exports.signup = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ error: errors.array() });
   }
   const user = new User(req.body);
   user.save((err, user) => {
     if (err) {
       return res.status(400).json({
-        err: "Not able to save user in DB",
+        error: "Not able to save user in DB",
       });
     }
     res.json({
