@@ -46,7 +46,7 @@ exports.createProduct = (req,res) => {
         //handle filehere
 
         if(file.photo){
-            if(file.photo.size > 3000000){
+            if(file.photo.size > 15000000){
                 return res.status(400).json({
                     error:"File size too Big"
                 });
@@ -57,6 +57,7 @@ exports.createProduct = (req,res) => {
 
         // save to the DB
         product.save((err,product)=>{
+            
             if(err){
                 return res.status(400).json({
                     error:"Saving product in DB failed"
@@ -77,6 +78,7 @@ exports.getProduct = ( req , res ) =>{
 exports.photo = (req,res,next) =>{
     if(req.product.photo.data){
         res.set('Content-Type',req.product.photo.ContentType);
+        res.send(req.product.photo.data);
     }
     next();
 }
